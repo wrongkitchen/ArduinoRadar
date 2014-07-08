@@ -104,8 +104,20 @@
 
   Radar.prototype = {
 
+    drawLine: function(start, end) {
+      var lineCanvas = document.getElementById('radarLine');
+      var lineCanvasCtx = lineCanvas.getContext("2d");
+
+      lineCanvasCtx.clearRect ( 0 , 0 , lineCanvasCtx.canvas.width , lineCanvasCtx.canvas.height);
+
+      lineCanvasCtx.beginPath();
+      lineCanvasCtx.moveTo(400, 400);
+      lineCanvasCtx.lineTo(start, end);
+      lineCanvasCtx.strokeStyle = "lightgreen";
+      lineCanvasCtx.lineWidth = 2;
+      lineCanvasCtx.stroke();
+    },
     draw: function(distance, azimuth) {
-    // draw: function(distance, start, end) {
 
       var x, y;
 
@@ -115,35 +127,30 @@
       var convertToAngle = function(angle){
         return angle * (Math.PI / 180);
       }
+      
+      var circleX = (x / 2) + (distance * Math.sin(convertToAngle(270) + convertToAngle(azimuth)));
+      var circleY = y - (distance * Math.cos(convertToAngle(270) + convertToAngle(azimuth)));
+      
+      this.drawLine(
+        (x / 2) + (800 * Math.sin(convertToAngle(270) + convertToAngle(azimuth))), 
+        y - (800 * Math.cos(convertToAngle(270) + convertToAngle(azimuth)))
+      );
 
-      var circleX = (x / 2) + (distance * Math.sin(135 + convertToAngle(azimuth)));
-      var circleY = y - (distance * Math.cos(135 + convertToAngle(azimuth)));
+      this.ctx.beginPath();
+      this.ctx.arc(
+        circleX,
+        circleY,
+        5,
+        0,
+        2 * Math.PI
+      );
+      // // Set color of arc line
+      this.ctx.strokeStyle = "lightgreen";
+      this.ctx.lineWidth = 1;
 
-      // if(azimuth <= 90){
-        
-        console.log("distance: " + distance);
-        console.log("angle: " + azimuth);
-        console.log("circleX: " + Math.floor(circleX));
-        console.log("circleY: " + Math.floor(circleY));
-        console.log("--------------------------------------------");
-
-        this.ctx.beginPath();
-        this.ctx.arc(
-          Math.floor(circleY),
-          Math.floor(circleX),
-          5,
-          0,
-          2 * Math.PI
-        );
-
-        // // Set color of arc line
-        this.ctx.strokeStyle = "lightgreen";
-        this.ctx.lineWidth = 1;
-
-        // // Commit the line and close the path
-        this.ctx.stroke();
-        this.ctx.closePath();
-      // }
+      // // Commit the line and close the path
+      this.ctx.stroke();
+      this.ctx.closePath();
 
       return this;
     },
@@ -163,7 +170,6 @@
           this.last = this.steps[azimuth + 1];
         }
 
-        // this.draw(distance, this.steps[azimuth], this.last);
         this.draw(distance, azimuth);
       } else {
 
